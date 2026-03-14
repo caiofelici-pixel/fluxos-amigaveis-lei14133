@@ -1,1 +1,4 @@
 project_id = "vqeomukzhowgfgmlfmcl"
+
+[functions.gerar-inciso]
+verify_jwt = false
