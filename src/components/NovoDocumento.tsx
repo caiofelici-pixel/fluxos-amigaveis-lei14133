@@ -3,17 +3,59 @@ import { useDocumento } from "@/contexts/DocumentoContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Documento } from "@/data/art18";
-import { FileText, Scale } from "lucide-react";
+import { Documento, INCISOS_ART18 } from "@/data/art18";
+import { FileText, Scale, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 export function NovoDocumento() {
-  const { criarDocumento } = useDocumento();
+  const { criarDocumento, atualizarInciso } = useDocumento();
   const [objeto, setObjeto] = useState("");
   const [tipo, setTipo] = useState<Documento["tipo"]>("ETP");
+  const [gerarAuto, setGerarAuto] = useState(true);
+  const [criando, setCriando] = useState(false);
+  const [progressoMsg, setProgressoMsg] = useState("");
 
-  const handleCriar = () => {
+  const handleCriar = async () => {
     if (!objeto.trim()) return;
+    
     criarDocumento(objeto.trim(), tipo);
+
+    if (gerarAuto) {
+      setCriando(true);
+      let preenchidos = 0;
+
+      for (const inciso of INCISOS_ART18) {
+        setProgressoMsg(`Gerando inciso ${inciso.numero} — ${inciso.titulo}...`);
+        try {
+          const { data, error } = await supabase.functions.invoke("gerar-inciso", {
+            body: {
+              objeto: objeto.trim(),
+              tipo,
+              incisoNumero: inciso.numero,
+              incisoTitulo: inciso.titulo,
+              incisoDescricao: inciso.descricao,
+              incisoTextoLegal: inciso.textoLegal,
+            },
+          });
+
+          if (!error && data?.content) {
+            atualizarInciso(inciso.numero, data.content);
+            preenchidos++;
+          }
+        } catch (err) {
+          console.error(`Erro no inciso ${inciso.numero}:`, err);
+        }
+      }
+
+      setCriando(false);
+      setProgressoMsg("");
+      toast({
+        title: "Documento gerado!",
+        description: `${preenchidos} de ${INCISOS_ART18.length} incisos preenchidos com IA.`,
+      });
+    }
   };
 
   return (
@@ -45,6 +87,7 @@ export function NovoDocumento() {
                 onChange={(e) => setObjeto(e.target.value)}
                 placeholder="Ex: Aquisição de merenda escolar para rede municipal"
                 className="h-11"
+                disabled={criando}
               />
             </div>
 
@@ -52,7 +95,7 @@ export function NovoDocumento() {
               <label className="block text-body font-medium text-foreground mb-2">
                 Tipo de Documento
               </label>
-              <Select value={tipo} onValueChange={(v) => setTipo(v as Documento["tipo"])}>
+              <Select value={tipo} onValueChange={(v) => setTipo(v as Documento["tipo"])} disabled={criando}>
                 <SelectTrigger className="h-11">
                   <SelectValue />
                 </SelectTrigger>
@@ -79,13 +122,36 @@ export function NovoDocumento() {
               </Select>
             </div>
 
+            <div className="flex items-center justify-between rounded-md border border-input px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-body font-medium text-foreground">
+                  Gerar conteúdo com IA
+                </span>
+              </div>
+              <Switch checked={gerarAuto} onCheckedChange={setGerarAuto} disabled={criando} />
+            </div>
+
             <Button
               onClick={handleCriar}
-              disabled={!objeto.trim()}
-              className="w-full h-11 font-medium transition-all duration-150 hover:-translate-y-px hover:shadow-elevated"
+              disabled={!objeto.trim() || criando}
+              className="w-full h-11 font-medium transition-all duration-150 hover:-translate-y-px hover:shadow-elevated gap-2"
             >
-              Iniciar Fase Preparatória
+              {criando ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Gerando documento...
+                </>
+              ) : (
+                "Iniciar Fase Preparatória"
+              )}
             </Button>
+
+            {criando && progressoMsg && (
+              <p className="text-xs text-muted-foreground text-center animate-pulse">
+                {progressoMsg}
+              </p>
+            )}
           </div>
         </div>
 
