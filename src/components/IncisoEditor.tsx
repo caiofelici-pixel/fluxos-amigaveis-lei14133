@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface IncisoEditorProps {
   incisoNumero: string;
@@ -18,6 +20,7 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
   const [valor, setValor] = useState(
     documento?.incisos[incisoNumero]?.conteudo || ""
   );
+  const [gerando, setGerando] = useState(false);
 
   if (!inciso || !documento) return null;
 
@@ -28,6 +31,39 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
   const handleChange = (val: string) => {
     setValor(val);
     atualizarInciso(incisoNumero, val);
+  };
+
+  const gerarComIA = async () => {
+    setGerando(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("gerar-inciso", {
+        body: {
+          objeto: documento.objeto,
+          tipo: documento.tipo,
+          incisoNumero: inciso.numero,
+          incisoTitulo: inciso.titulo,
+          incisoDescricao: inciso.descricao,
+          incisoTextoLegal: inciso.textoLegal,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const conteudo = data?.content || "";
+      setValor(conteudo);
+      atualizarInciso(incisoNumero, conteudo);
+      toast({ title: "Conteúdo gerado", description: `Inciso ${inciso.numero} preenchido com IA.` });
+    } catch (err: any) {
+      console.error("Erro ao gerar:", err);
+      toast({
+        title: "Erro ao gerar conteúdo",
+        description: err?.message || "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setGerando(false);
+    }
   };
 
   return (
@@ -60,29 +96,46 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
           <label className="text-body font-medium text-foreground">
             Conteúdo
           </label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground">
-                <BookOpen className="h-3.5 w-3.5" />
-                Texto da Lei
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 text-body" align="end">
-              <p className="font-medium text-foreground mb-2">
-                Lei 14.133/2021
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                {inciso.textoLegal}
-              </p>
-            </PopoverContent>
-          </Popover>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={gerarComIA}
+              disabled={gerando}
+              className="gap-1.5 text-xs"
+            >
+              {gerando ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
+              {gerando ? "Gerando..." : "Gerar com IA"}
+            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  Texto da Lei
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-body" align="end">
+                <p className="font-medium text-foreground mb-2">
+                  Lei 14.133/2021
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {inciso.textoLegal}
+                </p>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <Textarea
           value={valor}
           onChange={(e) => handleChange(e.target.value)}
-          placeholder={`Descreva aqui o conteúdo referente a "${inciso.titulo}" para o objeto definido...`}
+          placeholder={gerando ? "Gerando conteúdo com IA..." : `Descreva aqui o conteúdo referente a "${inciso.titulo}" para o objeto definido...`}
           className="min-h-[200px] resize-y text-body leading-relaxed border-input bg-background"
+          disabled={gerando}
         />
 
         {documento.incisos[incisoNumero]?.preenchido && (
