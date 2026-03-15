@@ -144,7 +144,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Conforme Lei nº 14.133/2021 — Art. 18
+          By Skynet Tecnologia
         </p>
       </div>
     </div>
