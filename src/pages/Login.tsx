@@ -62,7 +62,7 @@ export default function Login() {
           <div className="inline-flex items-center gap-2 mb-6">
             <Scale className="h-8 w-8 text-primary" />
             <span className="text-xl font-semibold text-foreground tracking-tight">
-              Licitador 14.133
+              Sistema Automatizado de Criação
             </span>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
