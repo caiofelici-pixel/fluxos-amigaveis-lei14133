@@ -66,7 +66,7 @@ export default function Login() {
             </span>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {modo === "login" ? "Acesso ao Sistema" : "Criar Conta"}
+            {modo === "login" ? "Bem Vindo ao Sistema" : "Criar Conta"}
           </h1>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             {modo === "login"
