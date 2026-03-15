@@ -62,11 +62,11 @@ export default function Login() {
           <div className="inline-flex items-center gap-2 mb-6">
             <Scale className="h-8 w-8 text-primary" />
             <span className="text-xl font-semibold text-foreground tracking-tight">
-              Licitador 14.133
+              Sistema Automatizado de Criação
             </span>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {modo === "login" ? "Acesso ao Sistema" : "Criar Conta"}
+            {modo === "login" ? "Bem Vindo ao Sistema" : "Criar Conta"}
           </h1>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             {modo === "login"
@@ -144,7 +144,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Conforme Lei nº 14.133/2021 — Art. 18
+          By Skynet Tecnologia
         </p>
       </div>
     </div>
