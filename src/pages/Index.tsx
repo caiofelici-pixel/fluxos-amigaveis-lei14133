@@ -37,6 +37,7 @@ const Index = () => {
               incisoNumero={incisoAtivo}
               onNavigate={setIncisoAtivo}
             />
+            <ExportarDocumento />
           </div>
         </main>
       </div>
