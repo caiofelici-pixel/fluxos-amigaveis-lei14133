@@ -4,6 +4,7 @@ import { BarraConformidade } from "@/components/BarraConformidade";
 import { SidebarNav } from "@/components/SidebarNav";
 import { IncisoEditor } from "@/components/IncisoEditor";
 import { NovoDocumento } from "@/components/NovoDocumento";
+import { ExportarDocumento } from "@/components/ExportarDocumento";
 import { Scale } from "lucide-react";
 
 const Index = () => {
@@ -36,6 +37,7 @@ const Index = () => {
               incisoNumero={incisoAtivo}
               onNavigate={setIncisoAtivo}
             />
+            <ExportarDocumento />
           </div>
         </main>
       </div>
