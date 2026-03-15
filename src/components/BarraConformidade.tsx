@@ -7,6 +7,7 @@ import { LogOut } from "lucide-react";
 export function BarraConformidade() {
   const { getProgresso, documento } = useDocumento();
   const { preenchidos, total, percentual } = getProgresso();
+  const { logout } = useAuth();
 
   if (!documento) return null;
 
