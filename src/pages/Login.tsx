@@ -6,35 +6,41 @@ import { Input } from "@/components/ui/input";
 import { Scale, LogIn, UserPlus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+function usernameToEmail(username: string) {
+  return `${username.toLowerCase().trim()}@licitador.local`;
+}
+
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [modo, setModo] = useState<"login" | "cadastro">("login");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !senha.trim()) return;
+    if (!usuario.trim() || !senha.trim()) return;
 
+    const email = usernameToEmail(usuario);
     setCarregando(true);
+
     try {
       if (modo === "login") {
         const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email,
           password: senha,
         });
         if (error) throw error;
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
-          email: email.trim(),
+          email,
           password: senha,
         });
         if (error) throw error;
         toast({
-          title: "Cadastro realizado!",
-          description: "Verifique seu e-mail para confirmar a conta.",
+          title: "Conta criada com sucesso!",
+          description: "Você já pode fazer login.",
         });
         setModo("login");
       }
@@ -65,7 +71,7 @@ export default function Login() {
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             {modo === "login"
               ? "Informe suas credenciais para acessar o sistema."
-              : "Preencha os dados para criar sua conta."}
+              : "Escolha um nome de usuário e uma senha."}
           </p>
         </div>
 
@@ -73,13 +79,13 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Usuário (e-mail)
+                Usuário
               </label>
               <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                type="text"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                placeholder="Digite seu nome de usuário"
                 className="h-11"
                 disabled={carregando}
                 required
@@ -104,7 +110,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              disabled={!email.trim() || !senha.trim() || carregando}
+              disabled={!usuario.trim() || !senha.trim() || carregando}
               className="w-full h-11 font-medium transition-all duration-150 hover:-translate-y-px hover:shadow-elevated gap-2"
             >
               {carregando ? (
