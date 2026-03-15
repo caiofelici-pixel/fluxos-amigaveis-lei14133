@@ -1,9 +1,13 @@
 import { Progress } from "@/components/ui/progress";
 import { useDocumento } from "@/contexts/DocumentoContext";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 export function BarraConformidade() {
   const { getProgresso, documento } = useDocumento();
   const { preenchidos, total, percentual } = getProgresso();
+  const { logout } = useAuth();
 
   if (!documento) return null;
 
@@ -24,6 +28,10 @@ export function BarraConformidade() {
             {percentual}%
           </span>
         </div>
+        <Button variant="ghost" size="sm" onClick={logout} className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <LogOut className="h-4 w-4" />
+          Sair
+        </Button>
       </div>
     </div>
   );
