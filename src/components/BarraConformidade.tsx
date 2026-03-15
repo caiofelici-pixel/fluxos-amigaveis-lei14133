@@ -1,5 +1,8 @@
 import { Progress } from "@/components/ui/progress";
 import { useDocumento } from "@/contexts/DocumentoContext";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 export function BarraConformidade() {
   const { getProgresso, documento } = useDocumento();
