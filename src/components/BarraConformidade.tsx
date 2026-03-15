@@ -28,6 +28,10 @@ export function BarraConformidade() {
             {percentual}%
           </span>
         </div>
+        <Button variant="ghost" size="sm" onClick={logout} className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <LogOut className="h-4 w-4" />
+          Sair
+        </Button>
       </div>
     </div>
   );
