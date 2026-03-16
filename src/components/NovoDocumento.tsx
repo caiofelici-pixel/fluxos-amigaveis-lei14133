@@ -13,11 +13,24 @@ import { useNavigate } from "react-router-dom";
 
 export function NovoDocumento() {
   const { criarDocumento, atualizarInciso } = useDocumento();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [objeto, setObjeto] = useState("");
   const [tipo, setTipo] = useState<Documento["tipo"]>("ETP");
   const [gerarAuto, setGerarAuto] = useState(true);
   const [criando, setCriando] = useState(false);
   const [progressoMsg, setProgressoMsg] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .then(({ data }) => setIsAdmin(!!data && data.length > 0));
+  }, [user]);
 
   const handleCriar = async () => {
     if (!objeto.trim()) return;
