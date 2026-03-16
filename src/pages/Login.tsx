@@ -26,11 +26,24 @@ export default function Login() {
 
     try {
       if (modo === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password: senha,
         });
         if (error) throw error;
+
+        // Check if user is blocked
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("blocked")
+          .eq("id", data.user.id)
+          .single();
+
+        if (profile?.blocked) {
+          await supabase.auth.signOut();
+          throw new Error("Seu acesso foi bloqueado. Contate o administrador.");
+        }
+
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
