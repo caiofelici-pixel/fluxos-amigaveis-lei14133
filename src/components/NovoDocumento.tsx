@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDocumento } from "@/contexts/DocumentoContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Documento, INCISOS_ART18 } from "@/data/art18";
-import { FileText, Scale, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Scale, Sparkles, Loader2, Shield, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { useNavigate } from "react-router-dom";
 
 export function NovoDocumento() {
   const { criarDocumento, atualizarInciso } = useDocumento();
