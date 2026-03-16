@@ -1,21 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDocumento } from "@/contexts/DocumentoContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Documento, INCISOS_ART18 } from "@/data/art18";
-import { FileText, Scale, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Scale, Sparkles, Loader2, Shield, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { useNavigate } from "react-router-dom";
 
 export function NovoDocumento() {
   const { criarDocumento, atualizarInciso } = useDocumento();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [objeto, setObjeto] = useState("");
   const [tipo, setTipo] = useState<Documento["tipo"]>("ETP");
   const [gerarAuto, setGerarAuto] = useState(true);
   const [criando, setCriando] = useState(false);
   const [progressoMsg, setProgressoMsg] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .then(({ data }) => setIsAdmin(!!data && data.length > 0));
+  }, [user]);
 
   const handleCriar = async () => {
     if (!objeto.trim()) return;
@@ -59,7 +74,19 @@ export function NovoDocumento() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="flex min-h-screen items-center justify-center bg-background relative">
+      <div className="absolute top-4 right-4 flex items-center gap-1">
+        {isAdmin && (
+          <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="gap-1.5 text-muted-foreground hover:text-foreground">
+            <Shield className="h-4 w-4" />
+            Admin
+          </Button>
+        )}
+        <Button variant="ghost" size="sm" onClick={logout} className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <LogOut className="h-4 w-4" />
+          Sair
+        </Button>
+      </div>
       <div className="w-full max-w-lg">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 mb-6">
