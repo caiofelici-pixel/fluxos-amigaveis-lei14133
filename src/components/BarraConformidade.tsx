@@ -1,13 +1,28 @@
+import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { useDocumento } from "@/contexts/DocumentoContext";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function BarraConformidade() {
   const { getProgresso, documento } = useDocumento();
   const { preenchidos, total, percentual } = getProgresso();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .then(({ data }) => setIsAdmin(!!data && data.length > 0));
+  }, [user]);
 
   if (!documento) return null;
 
@@ -28,10 +43,18 @@ export function BarraConformidade() {
             {percentual}%
           </span>
         </div>
-        <Button variant="ghost" size="sm" onClick={logout} className="gap-1.5 text-muted-foreground hover:text-foreground">
-          <LogOut className="h-4 w-4" />
-          Sair
-        </Button>
+        <div className="flex items-center gap-1">
+          {isAdmin && (
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="gap-1.5 text-muted-foreground hover:text-foreground">
+              <Shield className="h-4 w-4" />
+              Admin
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onClick={logout} className="gap-1.5 text-muted-foreground hover:text-foreground">
+            <LogOut className="h-4 w-4" />
+            Sair
+          </Button>
+        </div>
       </div>
     </div>
   );
