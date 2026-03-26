@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -13,8 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Shield, ShieldOff, Loader2, Users } from "lucide-react";
+import { ArrowLeft, Shield, ShieldOff, Loader2, Users, KeyRound } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface UserProfile {
@@ -33,6 +42,13 @@ export default function Admin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
+  // Reset password state
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [resetUser, setResetUser] = useState<UserProfile | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -40,7 +56,6 @@ export default function Admin() {
       return;
     }
 
-    // Check if current user is admin
     supabase
       .from("user_roles")
       .select("role")
@@ -73,7 +88,6 @@ export default function Admin() {
       return;
     }
 
-    // Fetch roles for all users
     const { data: roles } = await supabase
       .from("user_roles")
       .select("user_id, role");
@@ -108,6 +122,49 @@ export default function Admin() {
       });
     }
     setTogglingId(null);
+  }
+
+  function openResetDialog(u: UserProfile) {
+    setResetUser(u);
+    setNewPassword("");
+    setConfirmPassword("");
+    setResetDialogOpen(true);
+  }
+
+  async function handleResetPassword() {
+    if (!resetUser) return;
+    if (newPassword.length < 6) {
+      toast({ title: "Erro", description: "A senha deve ter pelo menos 6 caracteres.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Erro", description: "As senhas não coincidem.", variant: "destructive" });
+      return;
+    }
+
+    setResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-reset-password", {
+        body: { userId: resetUser.id, newPassword },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: "Senha alterada",
+        description: `Senha de "${resetUser.username}" foi redefinida com sucesso.`,
+      });
+      setResetDialogOpen(false);
+    } catch (err: any) {
+      toast({
+        title: "Erro",
+        description: err.message || "Falha ao redefinir senha.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
   }
 
   if (authLoading || !isAdmin) {
@@ -163,7 +220,7 @@ export default function Admin() {
                     <TableHead>Papel</TableHead>
                     <TableHead>Cadastro</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Acesso</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -197,15 +254,26 @@ export default function Admin() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          {isCurrentUser ? (
-                            <span className="text-xs text-muted-foreground">—</span>
-                          ) : (
-                            <Switch
-                              checked={!u.blocked}
-                              disabled={togglingId === u.id}
-                              onCheckedChange={() => toggleBlock(u.id, u.blocked)}
-                            />
-                          )}
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5"
+                              onClick={() => openResetDialog(u)}
+                            >
+                              <KeyRound className="h-3.5 w-3.5" />
+                              Resetar Senha
+                            </Button>
+                            {isCurrentUser ? (
+                              <span className="text-xs text-muted-foreground w-[44px] text-center">—</span>
+                            ) : (
+                              <Switch
+                                checked={!u.blocked}
+                                disabled={togglingId === u.id}
+                                onCheckedChange={() => toggleBlock(u.id, u.blocked)}
+                              />
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -216,6 +284,65 @@ export default function Admin() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              Redefinir Senha
+            </DialogTitle>
+            <DialogDescription>
+              Defina uma nova senha para o usuário <strong>{resetUser?.username}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Nova Senha
+              </label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+                disabled={resetting}
+                minLength={6}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Confirmar Senha
+              </label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repita a senha"
+                disabled={resetting}
+                minLength={6}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setResetDialogOpen(false)} disabled={resetting}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={!newPassword || !confirmPassword || resetting}
+              className="gap-1.5"
+            >
+              {resetting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
+              Redefinir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
