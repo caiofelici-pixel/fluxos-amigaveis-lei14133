@@ -10,8 +10,14 @@ import Login from "./pages/Login.tsx";
 import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { Loader2 } from "lucide-react";
+import { usePresenceBroadcast } from "@/hooks/usePresence";
 
 const queryClient = new QueryClient();
+
+function PresenceTracker({ children }: { children: React.ReactNode }) {
+  usePresenceBroadcast();
+  return <>{children}</>;
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
