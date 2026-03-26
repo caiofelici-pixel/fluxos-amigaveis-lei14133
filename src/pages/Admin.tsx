@@ -38,6 +38,7 @@ interface UserProfile {
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const onlineUsers = useOnlineUsers();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
