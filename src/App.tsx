@@ -49,9 +49,11 @@ const App = () => (
             <Route
               path="/"
               element={
-                <ProtectedRoute>
+              <ProtectedRoute>
+                <PresenceTracker>
                   <Index />
-                </ProtectedRoute>
+                </PresenceTracker>
+              </ProtectedRoute>
               }
             />
             <Route
