@@ -25,6 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Shield, ShieldOff, Loader2, Users, KeyRound } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useOnlineUsers } from "@/hooks/useOnlineUsers";
 
 interface UserProfile {
   id: string;

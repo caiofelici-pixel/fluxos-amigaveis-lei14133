@@ -60,7 +60,9 @@ const App = () => (
               path="/admin"
               element={
                 <ProtectedRoute>
-                  <Admin />
+                  <PresenceTracker>
+                    <Admin />
+                  </PresenceTracker>
                 </ProtectedRoute>
               }
             />
