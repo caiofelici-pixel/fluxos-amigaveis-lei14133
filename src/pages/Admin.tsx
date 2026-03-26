@@ -229,9 +229,22 @@ export default function Admin() {
                   {users.map((u) => {
                     const isCurrentUser = u.id === user?.id;
                     const isAdminUser = u.roles.includes("admin");
+                    const isOnline = onlineUsers.has(u.id);
                     return (
                       <TableRow key={u.id}>
-                        <TableCell className="font-medium">{u.username}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-block h-2.5 w-2.5 rounded-full shrink-0 ${
+                                isOnline
+                                  ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.5)]"
+                                  : "bg-destructive"
+                              }`}
+                              title={isOnline ? "Online" : "Offline"}
+                            />
+                            {u.username}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {isAdminUser ? (
                             <Badge className="gap-1">
