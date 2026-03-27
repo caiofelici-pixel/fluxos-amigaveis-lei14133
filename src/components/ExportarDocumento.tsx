@@ -7,7 +7,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Bord
 import { saveAs } from "file-saver";
 
 export function ExportarDocumento() {
-  const { documento, getProgresso } = useDocumento();
+  const { documento, getProgresso, resetDocumento } = useDocumento();
 
   if (!documento) return null;
 
