@@ -30,6 +30,10 @@ export function DocumentoProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const resetDocumento = useCallback(() => {
+    setDocumento(null);
+  }, []);
+
   const atualizarInciso = useCallback((numero: string, conteudo: string) => {
     setDocumento((prev) => {
       if (!prev) return prev;
