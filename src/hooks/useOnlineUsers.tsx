@@ -8,7 +8,7 @@ export function useOnlineUsers() {
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const channel = supabase.channel("online-users");
+    const channel = supabase.channel("online-users-listener");
 
     channel
       .on("presence", { event: "sync" }, () => {
