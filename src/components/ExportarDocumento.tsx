@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useDocumento } from "@/contexts/DocumentoContext";
 import { INCISOS_ART18 } from "@/data/art18";
-import { FileDown, FileText } from "lucide-react";
+import { FileDown, FileText, RotateCcw } from "lucide-react";
 import jsPDF from "jspdf";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
