@@ -41,7 +41,7 @@ export default function Login() {
 
         if (profile?.blocked) {
           await supabase.auth.signOut();
-          throw new Error("Seu acesso foi bloqueado. Contate o administrador.");
+          throw new Error("Seu acesso ainda não foi liberado. Aguarde a aprovação do administrador.");
         }
 
         navigate("/");
