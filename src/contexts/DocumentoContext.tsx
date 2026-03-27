@@ -58,7 +58,7 @@ export function DocumentoProvider({ children }: { children: React.ReactNode }) {
   }, [documento]);
 
   return (
-    <DocumentoContext.Provider value={{ documento, criarDocumento, atualizarInciso, getProgresso }}>
+    <DocumentoContext.Provider value={{ documento, resetDocumento, criarDocumento, atualizarInciso, getProgresso }}>
       {children}
     </DocumentoContext.Provider>
   );
