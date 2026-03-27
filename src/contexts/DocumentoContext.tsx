@@ -3,6 +3,7 @@ import { Documento, INCISOS_ART18 } from "@/data/art18";
 
 interface DocumentoContextType {
   documento: Documento | null;
+  resetDocumento: () => void;
   criarDocumento: (objeto: string, tipo: Documento["tipo"]) => void;
   atualizarInciso: (numero: string, conteudo: string) => void;
   getProgresso: () => { total: number; preenchidos: number; percentual: number };
