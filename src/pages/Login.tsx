@@ -53,7 +53,7 @@ export default function Login() {
         if (error) throw error;
         toast({
           title: "Conta criada com sucesso!",
-          description: "Você já pode fazer login.",
+          description: "Aguarde a aprovação do administrador para acessar o sistema.",
         });
         setModo("login");
       }
