@@ -58,9 +58,13 @@ export default function Login() {
         setModo("login");
       }
     } catch (err: any) {
+      let msg = err.message || "Falha na autenticação.";
+      if (modo === "login" && msg === "Invalid login credentials") {
+        msg = "EFETUE SEU CADASTRO";
+      }
       toast({
         title: "Erro",
-        description: err.message || "Falha na autenticação.",
+        description: msg,
         variant: "destructive",
       });
     } finally {
