@@ -307,6 +307,15 @@ export function ExportarDocumento() {
             <Button
               variant="outline"
               size="sm"
+              onClick={resetDocumento}
+              className="gap-1.5"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Nova Consulta
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={exportarPDF}
               disabled={incisosPreenchidos.length === 0}
               className="gap-1.5"
