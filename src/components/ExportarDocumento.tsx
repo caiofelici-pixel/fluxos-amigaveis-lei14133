@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { useDocumento } from "@/contexts/DocumentoContext";
 import { INCISOS_ART18 } from "@/data/art18";
-import { FileDown, FileText } from "lucide-react";
+import { FileDown, FileText, RotateCcw } from "lucide-react";
 import jsPDF from "jspdf";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
 
 export function ExportarDocumento() {
-  const { documento, getProgresso } = useDocumento();
+  const { documento, getProgresso, resetDocumento } = useDocumento();
 
   if (!documento) return null;
 
@@ -304,6 +304,15 @@ export function ExportarDocumento() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetDocumento}
+              className="gap-1.5"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Nova Consulta
+            </Button>
             <Button
               variant="outline"
               size="sm"
