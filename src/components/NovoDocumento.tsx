@@ -36,7 +36,7 @@ export function NovoDocumento() {
   const handleCriar = async () => {
     if (!objeto.trim()) return;
     
-    criarDocumento(objeto.trim(), tipo);
+    criarDocumento(objeto.trim(), tipo, nivelDetalhamento);
 
     if (gerarAuto) {
       setCriando(true);
