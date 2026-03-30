@@ -179,6 +179,38 @@ export default function Admin() {
     }
   }
 
+  function openDeleteDialog(u: UserProfile) {
+    setDeleteUser(u);
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleDeleteUser() {
+    if (!deleteUser) return;
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { userId: deleteUser.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
+      toast({
+        title: "Usuário excluído",
+        description: `"${deleteUser.username}" foi removido com sucesso.`,
+      });
+      setDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast({
+        title: "Erro",
+        description: err.message || "Falha ao excluir usuário.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (authLoading || !isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
