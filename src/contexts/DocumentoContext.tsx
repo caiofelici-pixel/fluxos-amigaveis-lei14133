@@ -4,7 +4,7 @@ import { Documento, INCISOS_ART18, NivelDetalhamento } from "@/data/art18";
 interface DocumentoContextType {
   documento: Documento | null;
   resetDocumento: () => void;
-  criarDocumento: (objeto: string, tipo: Documento["tipo"]) => void;
+  criarDocumento: (objeto: string, tipo: Documento["tipo"], nivelDetalhamento?: NivelDetalhamento) => void;
   atualizarInciso: (numero: string, conteudo: string) => void;
   getProgresso: () => { total: number; preenchidos: number; percentual: number };
 }
