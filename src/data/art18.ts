@@ -100,10 +100,13 @@ export const INCISOS_ART18: Inciso[] = [
   },
 ];
 
+export type NivelDetalhamento = "curto" | "medio" | "detalhado";
+
 export interface Documento {
   id: string;
   objeto: string;
   tipo: "ETP" | "TR" | "Matriz de Riscos";
+  nivelDetalhamento: NivelDetalhamento;
   dataCriacao: string;
   status: "rascunho" | "em_andamento" | "concluido";
   incisos: Record<string, { preenchido: boolean; conteudo: string }>;

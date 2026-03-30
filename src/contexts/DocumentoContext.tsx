@@ -14,7 +14,7 @@ const DocumentoContext = createContext<DocumentoContextType | null>(null);
 export function DocumentoProvider({ children }: { children: React.ReactNode }) {
   const [documento, setDocumento] = useState<Documento | null>(null);
 
-  const criarDocumento = useCallback((objeto: string, tipo: Documento["tipo"]) => {
+  const criarDocumento = useCallback((objeto: string, tipo: Documento["tipo"], nivelDetalhamento: NivelDetalhamento = "medio") => {
     const incisos: Documento["incisos"] = {};
     INCISOS_ART18.forEach((inc) => {
       incisos[inc.numero] = { preenchido: false, conteudo: "" };
@@ -24,6 +24,7 @@ export function DocumentoProvider({ children }: { children: React.ReactNode }) {
       id: crypto.randomUUID(),
       objeto,
       tipo,
+      nivelDetalhamento,
       dataCriacao: new Date().toISOString(),
       status: "rascunho",
       incisos,
