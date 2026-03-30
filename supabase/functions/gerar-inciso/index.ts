@@ -29,10 +29,9 @@ serve(async (req) => {
 Sua tarefa é gerar o conteúdo para um inciso específico do Art. 18 da Lei 14.133/2021, com base no objeto da contratação fornecido.
 
 Regras:
-- Seja CONCISO e DIRETO: respostas curtas, objetivas e sem repetições
+- ${instrucaoNivel}
 - Use linguagem técnica e formal, mas natural e fluida — evite textos rebuscados ou prolixos
 - Vá direto ao ponto: não repita o enunciado do inciso nem faça introduções desnecessárias
-- Máximo de 3 a 5 parágrafos curtos por inciso
 - Seja específico ao objeto da contratação — evite generalidades
 - Gere apenas o conteúdo do inciso, sem títulos, cabeçalhos ou numeração
 - Adapte ao tipo de documento (ETP, TR ou Matriz de Riscos)

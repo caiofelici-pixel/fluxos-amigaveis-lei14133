@@ -151,6 +151,28 @@ export function NovoDocumento() {
               </Select>
             </div>
 
+            <div>
+              <label className="block text-body font-medium text-foreground mb-2">
+                Nível de Detalhamento da IA
+              </label>
+              <Select value={nivelDetalhamento} onValueChange={(v) => setNivelDetalhamento(v as NivelDetalhamento)} disabled={criando}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="curto">
+                    Curto — respostas objetivas e diretas
+                  </SelectItem>
+                  <SelectItem value="medio">
+                    Médio — equilíbrio entre concisão e detalhes
+                  </SelectItem>
+                  <SelectItem value="detalhado">
+                    Detalhado — respostas completas e aprofundadas
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center justify-between rounded-md border border-input px-4 py-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-primary" />
