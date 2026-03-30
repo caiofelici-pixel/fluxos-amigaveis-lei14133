@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { Documento, INCISOS_ART18 } from "@/data/art18";
+import { Documento, INCISOS_ART18, NivelDetalhamento } from "@/data/art18";
 
 interface DocumentoContextType {
   documento: Documento | null;
