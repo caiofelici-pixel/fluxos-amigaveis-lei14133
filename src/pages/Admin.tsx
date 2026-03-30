@@ -327,11 +327,22 @@ export default function Admin() {
                             {isCurrentUser ? (
                               <span className="text-xs text-muted-foreground w-[44px] text-center">—</span>
                             ) : (
-                              <Switch
-                                checked={!u.blocked}
-                                disabled={togglingId === u.id}
-                                onCheckedChange={() => toggleBlock(u.id, u.blocked)}
-                              />
+                              <>
+                                <Switch
+                                  checked={!u.blocked}
+                                  disabled={togglingId === u.id}
+                                  onCheckedChange={() => toggleBlock(u.id, u.blocked)}
+                                />
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="gap-1.5"
+                                  onClick={() => openDeleteDialog(u)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  Excluir
+                                </Button>
+                              </>
                             )}
                           </div>
                         </TableCell>
