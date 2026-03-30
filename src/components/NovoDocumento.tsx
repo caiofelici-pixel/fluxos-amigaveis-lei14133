@@ -17,6 +17,7 @@ export function NovoDocumento() {
   const navigate = useNavigate();
   const [objeto, setObjeto] = useState("");
   const [tipo, setTipo] = useState<Documento["tipo"]>("ETP");
+  const [nivelDetalhamento, setNivelDetalhamento] = useState<NivelDetalhamento>("medio");
   const [gerarAuto, setGerarAuto] = useState(true);
   const [criando, setCriando] = useState(false);
   const [progressoMsg, setProgressoMsg] = useState("");
