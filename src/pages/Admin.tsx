@@ -23,7 +23,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Shield, ShieldOff, Loader2, Users, KeyRound } from "lucide-react";
+import { ArrowLeft, Shield, ShieldOff, Loader2, Users, KeyRound, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { useOnlineUsers } from "@/hooks/useOnlineUsers";
 
@@ -50,6 +60,9 @@ export default function Admin() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [resetting, setResetting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteUser, setDeleteUser] = useState<UserProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -169,6 +182,38 @@ export default function Admin() {
     }
   }
 
+  function openDeleteDialog(u: UserProfile) {
+    setDeleteUser(u);
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleDeleteUser() {
+    if (!deleteUser) return;
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { userId: deleteUser.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
+      toast({
+        title: "Usuário excluído",
+        description: `"${deleteUser.username}" foi removido com sucesso.`,
+      });
+      setDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast({
+        title: "Erro",
+        description: err.message || "Falha ao excluir usuário.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (authLoading || !isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -282,11 +327,22 @@ export default function Admin() {
                             {isCurrentUser ? (
                               <span className="text-xs text-muted-foreground w-[44px] text-center">—</span>
                             ) : (
-                              <Switch
-                                checked={!u.blocked}
-                                disabled={togglingId === u.id}
-                                onCheckedChange={() => toggleBlock(u.id, u.blocked)}
-                              />
+                              <>
+                                <Switch
+                                  checked={!u.blocked}
+                                  disabled={togglingId === u.id}
+                                  onCheckedChange={() => toggleBlock(u.id, u.blocked)}
+                                />
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="gap-1.5"
+                                  onClick={() => openDeleteDialog(u)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  Excluir
+                                </Button>
+                              </>
                             )}
                           </div>
                         </TableCell>
@@ -358,6 +414,35 @@ export default function Admin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Excluir Usuário
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o usuário <strong>{deleteUser?.username}</strong>? Esta ação é irreversível e removerá todos os dados associados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-1.5"
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
