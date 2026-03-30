@@ -133,16 +133,16 @@ export function NovoDocumento() {
                       Estudo Técnico Preliminar (ETP)
                     </span>
                   </SelectItem>
-                  <SelectItem value="TR">
-                    <span className="flex items-center gap-2">
+                  <SelectItem value="TR" disabled>
+                    <span className="flex items-center gap-2 opacity-50">
                       <FileText className="h-4 w-4" />
-                      Termo de Referência (TR)
+                      Termo de Referência (TR) — em breve
                     </span>
                   </SelectItem>
-                  <SelectItem value="Matriz de Riscos">
-                    <span className="flex items-center gap-2">
+                  <SelectItem value="Matriz de Riscos" disabled>
+                    <span className="flex items-center gap-2 opacity-50">
                       <FileText className="h-4 w-4" />
-                      Matriz de Riscos
+                      Matriz de Riscos — em breve
                     </span>
                   </SelectItem>
                 </SelectContent>
