@@ -49,6 +49,7 @@ export function NovoDocumento() {
             body: {
               objeto: objeto.trim(),
               tipo,
+              nivelDetalhamento,
               incisoNumero: inciso.numero,
               incisoTitulo: inciso.titulo,
               incisoDescricao: inciso.descricao,
