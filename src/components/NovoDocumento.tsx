@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Documento, INCISOS_ART18 } from "@/data/art18";
+import { Documento, INCISOS_ART18, NivelDetalhamento } from "@/data/art18";
 import { FileText, Scale, Sparkles, Loader2, Shield, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ export function NovoDocumento() {
   const navigate = useNavigate();
   const [objeto, setObjeto] = useState("");
   const [tipo, setTipo] = useState<Documento["tipo"]>("ETP");
+  const [nivelDetalhamento, setNivelDetalhamento] = useState<NivelDetalhamento>("medio");
   const [gerarAuto, setGerarAuto] = useState(true);
   const [criando, setCriando] = useState(false);
   const [progressoMsg, setProgressoMsg] = useState("");
@@ -35,7 +36,7 @@ export function NovoDocumento() {
   const handleCriar = async () => {
     if (!objeto.trim()) return;
     
-    criarDocumento(objeto.trim(), tipo);
+    criarDocumento(objeto.trim(), tipo, nivelDetalhamento);
 
     if (gerarAuto) {
       setCriando(true);
@@ -48,6 +49,7 @@ export function NovoDocumento() {
             body: {
               objeto: objeto.trim(),
               tipo,
+              nivelDetalhamento,
               incisoNumero: inciso.numero,
               incisoTitulo: inciso.titulo,
               incisoDescricao: inciso.descricao,
@@ -144,6 +146,28 @@ export function NovoDocumento() {
                       <FileText className="h-4 w-4" />
                       Matriz de Riscos — em breve
                     </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-body font-medium text-foreground mb-2">
+                Nível de Detalhamento da IA
+              </label>
+              <Select value={nivelDetalhamento} onValueChange={(v) => setNivelDetalhamento(v as NivelDetalhamento)} disabled={criando}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="curto">
+                    Curto — respostas objetivas e diretas
+                  </SelectItem>
+                  <SelectItem value="medio">
+                    Médio — equilíbrio entre concisão e detalhes
+                  </SelectItem>
+                  <SelectItem value="detalhado">
+                    Detalhado — respostas completas e aprofundadas
                   </SelectItem>
                 </SelectContent>
               </Select>

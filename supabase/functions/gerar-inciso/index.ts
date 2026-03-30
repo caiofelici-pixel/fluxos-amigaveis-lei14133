@@ -12,7 +12,14 @@ serve(async (req) => {
   }
 
   try {
-    const { objeto, tipo, incisoNumero, incisoTitulo, incisoDescricao, incisoTextoLegal } = await req.json();
+    const { objeto, tipo, nivelDetalhamento, incisoNumero, incisoTitulo, incisoDescricao, incisoTextoLegal } = await req.json();
+
+    const detalhamentoInstrucao: Record<string, string> = {
+      curto: "Seja extremamente conciso: máximo 1-2 parágrafos curtos. Vá direto ao ponto sem explicações extras.",
+      medio: "Use 3-5 parágrafos curtos. Seja objetivo mas inclua os pontos essenciais.",
+      detalhado: "Seja completo e aprofundado: 5-8 parágrafos. Inclua justificativas, referências legais e detalhes técnicos relevantes.",
+    };
+    const instrucaoNivel = detalhamentoInstrucao[nivelDetalhamento || "medio"];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -22,10 +29,9 @@ serve(async (req) => {
 Sua tarefa é gerar o conteúdo para um inciso específico do Art. 18 da Lei 14.133/2021, com base no objeto da contratação fornecido.
 
 Regras:
-- Seja CONCISO e DIRETO: respostas curtas, objetivas e sem repetições
+- ${instrucaoNivel}
 - Use linguagem técnica e formal, mas natural e fluida — evite textos rebuscados ou prolixos
 - Vá direto ao ponto: não repita o enunciado do inciso nem faça introduções desnecessárias
-- Máximo de 3 a 5 parágrafos curtos por inciso
 - Seja específico ao objeto da contratação — evite generalidades
 - Gere apenas o conteúdo do inciso, sem títulos, cabeçalhos ou numeração
 - Adapte ao tipo de documento (ETP, TR ou Matriz de Riscos)

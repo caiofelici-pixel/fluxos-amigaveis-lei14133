@@ -40,6 +40,7 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
         body: {
           objeto: documento.objeto,
           tipo: documento.tipo,
+          nivelDetalhamento: documento.nivelDetalhamento,
           incisoNumero: inciso.numero,
           incisoTitulo: inciso.titulo,
           incisoDescricao: inciso.descricao,
