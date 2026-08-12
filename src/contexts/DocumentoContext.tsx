@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { Documento, INCISOS_ART18, NivelDetalhamento } from "@/data/art18";
+import { Documento, INCISOS_ART18, NivelDetalhamento, getSecoes } from "@/data/art18";
 
 interface DocumentoContextType {
   documento: Documento | null;
@@ -16,7 +16,7 @@ export function DocumentoProvider({ children }: { children: React.ReactNode }) {
 
   const criarDocumento = useCallback((objeto: string, tipo: Documento["tipo"], nivelDetalhamento: NivelDetalhamento = "medio") => {
     const incisos: Documento["incisos"] = {};
-    INCISOS_ART18.forEach((inc) => {
+    getSecoes(tipo).forEach((inc) => {
       incisos[inc.numero] = { preenchido: false, conteudo: "" };
     });
 
@@ -50,7 +50,7 @@ export function DocumentoProvider({ children }: { children: React.ReactNode }) {
 
   const getProgresso = useCallback(() => {
     if (!documento) return { total: 0, preenchidos: 0, percentual: 0 };
-    const obrigatorios = INCISOS_ART18.filter((i) => i.obrigatorio);
+    const obrigatorios = getSecoes(documento.tipo).filter((i) => i.obrigatorio);
     const total = obrigatorios.length;
     const preenchidos = obrigatorios.filter(
       (i) => documento.incisos[i.numero]?.preenchido

@@ -24,29 +24,35 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const isTR = tipo === "TR";
+    const contextoDoc = isTR
+      ? `Você está redigindo um TERMO DE REFERÊNCIA (TR), cujos elementos estão previstos no Art. 6º, inciso XXIII, da Lei nº 14.133/2021.`
+      : `Você está redigindo um ESTUDO TÉCNICO PRELIMINAR (ETP), cujos elementos estão previstos no Art. 18 da Lei nº 14.133/2021.`;
+    const rotulo = isTR ? "Alínea" : "Inciso";
+
     const systemPrompt = `Você é um especialista em licitações públicas brasileiras, com profundo conhecimento da Lei nº 14.133/2021.
 
-Sua tarefa é gerar o conteúdo para um inciso específico do Art. 18 da Lei 14.133/2021, com base no objeto da contratação fornecido.
+${contextoDoc}
 
 Regras:
 - ${instrucaoNivel}
-- Use linguagem técnica e formal, mas natural e fluida — evite textos rebuscados ou prolixos
-- Vá direto ao ponto: não repita o enunciado do inciso nem faça introduções desnecessárias
-- Seja específico ao objeto da contratação — evite generalidades
-- Gere apenas o conteúdo do inciso, sem títulos, cabeçalhos ou numeração
-- Adapte ao tipo de documento (ETP, TR ou Matriz de Riscos)
-- Priorize informações práticas e aplicáveis diretamente no documento oficial`;
+- Linguagem clara, objetiva e compatível com documentos oficiais da Administração Pública
+- A redação deve ter foco exclusivo na necessidade pública e no interesse público, jamais em interesses privados ou comerciais
+- Vá direto ao ponto: não repita o enunciado do item nem faça introduções, saudações ou conclusões genéricas
+- Seja específico ao objeto da contratação — evite generalidades e texto de preenchimento
+- Gere apenas o conteúdo do item, sem títulos, cabeçalhos ou numeração
+- Priorize informações práticas, aplicáveis diretamente no documento oficial, e coerentes com a Lei nº 14.133/2021`;
 
     const userPrompt = `Objeto da contratação: "${objeto}"
-Tipo de documento: ${tipo}
+Tipo de documento: ${isTR ? "Termo de Referência (TR)" : tipo}
 
-Gere o conteúdo para o seguinte inciso do Art. 18 da Lei 14.133/2021:
+Gere o conteúdo para o seguinte item:
 
-Inciso ${incisoNumero} - ${incisoTitulo}
+${rotulo} ${incisoNumero} - ${incisoTitulo}
 Descrição: ${incisoDescricao}
 Texto legal: ${incisoTextoLegal}
 
-Gere um conteúdo completo, técnico e adequado para este inciso, considerando o objeto da contratação informado.`;
+Redija o conteúdo em linguagem oficial, objetiva e focada na necessidade pública, considerando o objeto informado.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

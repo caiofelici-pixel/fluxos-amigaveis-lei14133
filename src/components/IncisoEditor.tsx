@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { INCISOS_ART18 } from "@/data/art18";
+import { getSecoes, getRotulo } from "@/data/art18";
 import { useDocumento } from "@/contexts/DocumentoContext";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -15,8 +15,10 @@ interface IncisoEditorProps {
 }
 
 export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
-  const inciso = INCISOS_ART18.find((i) => i.numero === incisoNumero);
   const { documento, atualizarInciso } = useDocumento();
+  const secoes = getSecoes(documento?.tipo ?? "ETP");
+  const rotulo = getRotulo(documento?.tipo ?? "ETP");
+  const inciso = secoes.find((i) => i.numero === incisoNumero);
   const [valor, setValor] = useState(
     documento?.incisos[incisoNumero]?.conteudo || ""
   );
@@ -24,9 +26,9 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
 
   if (!inciso || !documento) return null;
 
-  const idx = INCISOS_ART18.findIndex((i) => i.numero === incisoNumero);
-  const anterior = idx > 0 ? INCISOS_ART18[idx - 1].numero : null;
-  const proximo = idx < INCISOS_ART18.length - 1 ? INCISOS_ART18[idx + 1].numero : null;
+  const idx = secoes.findIndex((i) => i.numero === incisoNumero);
+  const anterior = idx > 0 ? secoes[idx - 1].numero : null;
+  const proximo = idx < secoes.length - 1 ? secoes[idx + 1].numero : null;
 
   const handleChange = (val: string) => {
     setValor(val);
@@ -54,7 +56,7 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
       const conteudo = data?.content || "";
       setValor(conteudo);
       atualizarInciso(incisoNumero, conteudo);
-      toast({ title: "Conteúdo gerado", description: `Inciso ${inciso.numero} preenchido com IA.` });
+      toast({ title: "Conteúdo gerado", description: `${rotulo} ${inciso.numero} preenchido com IA.` });
     } catch (err: any) {
       console.error("Erro ao gerar:", err);
       toast({
@@ -72,7 +74,7 @@ export function IncisoEditor({ incisoNumero, onNavigate }: IncisoEditorProps) {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
-            Inciso {inciso.numero}
+            {rotulo} {inciso.numero}
           </span>
           {inciso.obrigatorio ? (
             <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] uppercase tracking-wider">
