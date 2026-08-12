@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getReferenciaLegal } from "@/data/art18";
 
 export function BarraConformidade() {
   const { getProgresso, documento } = useDocumento();
@@ -31,10 +32,10 @@ export function BarraConformidade() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="text-body font-medium text-foreground">
-            Conformidade Art. 18
+            Conformidade {getReferenciaLegal(documento.tipo)}
           </span>
           <span className="font-mono text-xs text-muted-foreground">
-            {preenchidos}/{total} incisos obrigatórios
+            {preenchidos}/{total} itens obrigatórios
           </span>
         </div>
         <div className="flex items-center gap-3 flex-1 max-w-md">

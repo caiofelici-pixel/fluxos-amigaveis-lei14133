@@ -44,7 +44,7 @@ export function NovoDocumento() {
 
       const secoes = getSecoes(tipo);
       for (const inciso of secoes) {
-        setProgressoMsg(`Gerando inciso ${inciso.numero} — ${inciso.titulo}...`);
+        setProgressoMsg(`Gerando item ${inciso.numero} — ${inciso.titulo}...`);
         try {
           const { data, error } = await supabase.functions.invoke("gerar-inciso", {
             body: {
