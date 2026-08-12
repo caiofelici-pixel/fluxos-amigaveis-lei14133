@@ -111,3 +111,20 @@ export interface Documento {
   status: "rascunho" | "em_andamento" | "concluido";
   incisos: Record<string, { preenchido: boolean; conteudo: string }>;
 }
+
+import { SECOES_TR } from "./tr";
+
+/** Retorna as seções aplicáveis conforme o tipo de documento. */
+export function getSecoes(tipo: Documento["tipo"]): Inciso[] {
+  return tipo === "TR" ? SECOES_TR : INCISOS_ART18;
+}
+
+/** Rótulo usado na interface e nos documentos exportados. */
+export function getRotulo(tipo: Documento["tipo"]): string {
+  return tipo === "TR" ? "Alínea" : "Inciso";
+}
+
+/** Referência legal do conjunto de seções. */
+export function getReferenciaLegal(tipo: Documento["tipo"]): string {
+  return tipo === "TR" ? "Art. 6º, XXIII" : "Art. 18";
+}
