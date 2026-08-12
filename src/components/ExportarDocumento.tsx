@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useDocumento } from "@/contexts/DocumentoContext";
-import { INCISOS_ART18 } from "@/data/art18";
+import { getSecoes, getRotulo } from "@/data/art18";
 import { FileDown, FileText, RotateCcw } from "lucide-react";
 import jsPDF from "jspdf";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
@@ -12,8 +12,10 @@ export function ExportarDocumento() {
   if (!documento) return null;
 
   const { preenchidos, total, percentual } = getProgresso();
+  const secoes = getSecoes(documento.tipo);
+  const rotulo = getRotulo(documento.tipo);
 
-  const incisosPreenchidos = INCISOS_ART18.filter(
+  const incisosPreenchidos = secoes.filter(
     (i) => documento.incisos[i.numero]?.preenchido
   );
 
@@ -60,7 +62,7 @@ export function ExportarDocumento() {
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
     doc.text(`Data: ${new Date(documento.dataCriacao).toLocaleDateString("pt-BR")}`, margin, y);
-    doc.text(`Conformidade: ${preenchidos}/${total} incisos (${percentual}%)`, margin + 80, y);
+    doc.text(`Conformidade: ${preenchidos}/${total} itens (${percentual}%)`, margin + 80, y);
     y += 10;
 
     doc.setDrawColor(200, 200, 200);
@@ -69,7 +71,7 @@ export function ExportarDocumento() {
     y += 10;
 
     // Incisos
-    for (const inciso of INCISOS_ART18) {
+    for (const inciso of secoes) {
       const dados = documento.incisos[inciso.numero];
       if (!dados?.preenchido) continue;
 
@@ -79,7 +81,7 @@ export function ExportarDocumento() {
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(30, 64, 175);
-      doc.text(`Inciso ${inciso.numero} — ${inciso.titulo}`, margin, y);
+      doc.text(`${rotulo} ${inciso.numero} — ${inciso.titulo}`, margin, y);
       y += 6;
 
       // Legal reference
@@ -180,7 +182,7 @@ export function ExportarDocumento() {
       new Paragraph({
         children: [
           new TextRun({
-            text: `Data: ${new Date(documento.dataCriacao).toLocaleDateString("pt-BR")}    |    Conformidade: ${preenchidos}/${total} incisos (${percentual}%)`,
+            text: `Data: ${new Date(documento.dataCriacao).toLocaleDateString("pt-BR")}    |    Conformidade: ${preenchidos}/${total} itens (${percentual}%)`,
             size: 18,
             color: "64748B",
             font: "Arial",
@@ -201,7 +203,7 @@ export function ExportarDocumento() {
     );
 
     // Incisos
-    for (const inciso of INCISOS_ART18) {
+    for (const inciso of secoes) {
       const dados = documento.incisos[inciso.numero];
       if (!dados?.preenchido) continue;
 
@@ -209,7 +211,7 @@ export function ExportarDocumento() {
         new Paragraph({
           children: [
             new TextRun({
-              text: `Inciso ${inciso.numero} — ${inciso.titulo}`,
+              text: `${rotulo} ${inciso.numero} — ${inciso.titulo}`,
               bold: true,
               size: 24,
               color: "1E40AF",
@@ -300,7 +302,7 @@ export function ExportarDocumento() {
               Exportar Documento
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {incisosPreenchidos.length} de {INCISOS_ART18.length} incisos preenchidos
+              {incisosPreenchidos.length} de {secoes.length} itens preenchidos
             </p>
           </div>
           <div className="flex items-center gap-2">

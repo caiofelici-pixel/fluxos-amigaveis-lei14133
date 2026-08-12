@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Documento, INCISOS_ART18, NivelDetalhamento } from "@/data/art18";
+import { Documento, NivelDetalhamento, getSecoes } from "@/data/art18";
 import { FileText, Scale, Sparkles, Loader2, Shield, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -42,7 +42,8 @@ export function NovoDocumento() {
       setCriando(true);
       let preenchidos = 0;
 
-      for (const inciso of INCISOS_ART18) {
+      const secoes = getSecoes(tipo);
+      for (const inciso of secoes) {
         setProgressoMsg(`Gerando inciso ${inciso.numero} — ${inciso.titulo}...`);
         try {
           const { data, error } = await supabase.functions.invoke("gerar-inciso", {
@@ -70,7 +71,7 @@ export function NovoDocumento() {
       setProgressoMsg("");
       toast({
         title: "Documento gerado!",
-        description: `${preenchidos} de ${INCISOS_ART18.length} incisos preenchidos com IA.`,
+        description: `${preenchidos} de ${getSecoes(tipo).length} itens preenchidos com IA.`,
       });
     }
   };
@@ -135,10 +136,10 @@ export function NovoDocumento() {
                       Estudo Técnico Preliminar (ETP)
                     </span>
                   </SelectItem>
-                  <SelectItem value="TR" disabled>
-                    <span className="flex items-center gap-2 opacity-50">
+                  <SelectItem value="TR">
+                    <span className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      Termo de Referência (TR) — em breve
+                      Termo de Referência (TR)
                     </span>
                   </SelectItem>
                   <SelectItem value="Matriz de Riscos" disabled>
