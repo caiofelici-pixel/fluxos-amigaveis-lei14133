@@ -6,39 +6,41 @@ Deno.serve(async () => {
   const supabase = createClient(supabaseUrl, serviceRoleKey);
 
   const email = "admin@licitador.local";
-  const password = "admin1";
+  const password = "admin1234";
 
-  // Check if admin already exists
   const { data: existingUsers } = await supabase.auth.admin.listUsers();
-  const adminExists = existingUsers?.users?.some((u) => u.email === email);
+  const existing = existingUsers?.users?.find((u) => u.email === email);
 
-  if (adminExists) {
-    return new Response(JSON.stringify({ message: "Admin already exists" }), {
+  if (existing) {
+    const { error: updateError } = await supabase.auth.admin.updateUserById(existing.id, {
+      password,
+      email_confirm: true,
+    });
+    if (updateError) {
+      return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
+    }
+    await supabase.from("profiles").update({ blocked: false }).eq("id", existing.id);
+    await supabase.from("user_roles").upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
+    return new Response(JSON.stringify({ message: "Admin password reset" }), {
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  // Create admin user
   const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
   });
-
   if (createError) {
     return new Response(JSON.stringify({ error: createError.message }), { status: 500 });
   }
-
-  // The trigger will create profile + 'user' role automatically.
-  // Now add 'admin' role
+  await supabase.from("profiles").update({ blocked: false }).eq("id", newUser.user.id);
   const { error: roleError } = await supabase
     .from("user_roles")
-    .insert({ user_id: newUser.user.id, role: "admin" });
-
+    .upsert({ user_id: newUser.user.id, role: "admin" }, { onConflict: "user_id,role" });
   if (roleError) {
     return new Response(JSON.stringify({ error: roleError.message }), { status: 500 });
   }
-
   return new Response(JSON.stringify({ message: "Admin created successfully" }), {
     headers: { "Content-Type": "application/json" },
   });
