@@ -6,7 +6,7 @@ Deno.serve(async () => {
   const supabase = createClient(supabaseUrl, serviceRoleKey);
 
   const email = "admin@licitador.local";
-  const password = "admin1234";
+  const password = "moderador123";
 
   const { data: existingUsers } = await supabase.auth.admin.listUsers();
   const existing = existingUsers?.users?.find((u) => u.email === email);
